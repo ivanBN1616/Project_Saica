@@ -1,4 +1,4 @@
-('C:\\Users\\ivanb\\Desktop\\excel2\\build\\GUIv2.01\\PYZ-00.pyz',
+('C:\\Users\\ivanb\\Project_Saica\\excel2\\build\\GUIv2.01\\PYZ-00.pyz',
  [('PIL', 'C:\\Python\\Lib\\site-packages\\PIL\\__init__.py', 'PYMODULE'),
   ('PIL.BlpImagePlugin',
    'C:\\Python\\Lib\\site-packages\\PIL\\BlpImagePlugin.py',
