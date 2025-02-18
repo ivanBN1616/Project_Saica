@@ -1,10 +1,13 @@
 import tkinter as tk
-import os
 from tkinter import filedialog, messagebox
 from openpyxl import Workbook, load_workbook
 from pathlib import Path
 from datetime import datetime
+from PIL import Image, ImageTk  # Importar Pillow para manipular imágenes
 from openpyxl.styles import PatternFill, Border, Side, Alignment
+
+# Obtener la ruta absoluta del icono
+ruta_icono = Path(__file__).parent / "images" / "eliminar.png"
 
 def seleccionar_archivo(entry, archivos, tipo):
     archivo = filedialog.askopenfilename(filetypes=[("Archivos de Excel", "*.xlsx")])
@@ -108,7 +111,26 @@ def generar_reporte(archivos):
 
 root = tk.Tk()
 root.title("Procesador de Reportes Excel")
-root.geometry("600x400")
+root.geometry("650x300")
+root.config(bg="#F5F5F5")  # Fondo gris claro
+
+# Estilo minimalista para el botón
+def crear_boton(root, texto, comando, ancho=200, alto=40, color_fondo="#2196F3", color_texto="white"):
+    boton = tk.Button(
+        root, text=texto, command=comando, 
+        width=ancho//10, height=alto//40, 
+        bg=color_fondo, fg=color_texto, 
+        font=("Arial", 12, "bold"), relief="flat", bd=0,
+        padx=10, pady=5, 
+        highlightthickness=0
+    )
+    boton.pack(pady=10)
+    return boton
+
+# Cargar icono del botón borrar
+icono_borrar = Image.open(ruta_icono)
+icono_borrar = icono_borrar.resize((20, 20), Image.Resampling.LANCZOS)
+icono_borrar = ImageTk.PhotoImage(icono_borrar)
 
 frame_archivos = tk.Frame(root)
 frame_archivos.pack(pady=10)
@@ -117,18 +139,27 @@ archivos = {"cim3": "", "cim4": "", "ots": "", "trabajo_real": ""}
 entradas = []
 
 for i, tipo in enumerate(archivos.keys()):
-    lbl = tk.Label(frame_archivos, text=f"Archivo {tipo.upper()}: ")
+    lbl = tk.Label(frame_archivos, text=f" {tipo.upper()}: ", bg="#F5F5F5", font=("Arial", 10))
     lbl.grid(row=i, column=0, padx=5, pady=5)
-    entry = tk.Entry(frame_archivos, width=40)
+    entry = tk.Entry(frame_archivos, width=40, font=("Arial", 12), bd=2, relief="solid")  # Eliminado padx
     entry.grid(row=i, column=1, padx=5, pady=5)
     entradas.append(entry)
     btn = tk.Button(frame_archivos, text="Seleccionar", command=lambda t=tipo, e=entry: seleccionar_archivo(e, archivos, t))
     btn.grid(row=i, column=2, padx=5, pady=5)
 
-btn_generar = tk.Button(root, text="Generar Reporte", command=lambda: generar_reporte(archivos))
-btn_generar.pack(pady=10)
+# Frame para los botones de Generar Reporte y Borrar
+frame_botones = tk.Frame(root)
+frame_botones.pack(pady=10)
 
-btn_borrar = tk.Button(root, text="Borrar Archivos", command=lambda: borrar_archivos(archivos, entradas))
-btn_borrar.pack(pady=10)
+# Botón de "Generar Reporte"
+btn_generar = crear_boton(frame_botones, "Generar Reporte", lambda: generar_reporte(archivos), ancho=180)
+
+# Botón circular de "Borrar"
+btn_borrar = tk.Button(frame_botones, image=icono_borrar, command=lambda: borrar_archivos(archivos, entradas), bg="#FF5722", bd=0, relief="flat", width=40, height=40)
+btn_borrar.config(width=40, height=35, padx=0, pady=0)  # Configuramos el tamaño del botón circular
+btn_borrar.pack(side=tk.LEFT, padx=10)
+
+# Posicionar el botón de "Generar Reporte" junto al botón de "Borrar"
+btn_generar.pack(side=tk.LEFT, padx=10)
 
 root.mainloop()
