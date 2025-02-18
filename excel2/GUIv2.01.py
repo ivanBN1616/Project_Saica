@@ -119,7 +119,7 @@ root.geometry("600x300")
 frame_archivos = ctk.CTkFrame(root)
 frame_archivos.pack(pady=10)
 
-archivos = {"cim3": "", "cim4": "", "ots": "", "trabajo real": ""}
+archivos = {"cim3": "", "cim4": "", "ots": "", "trabajo_real": ""}
 entradas = []
 
 for i, tipo in enumerate(archivos.keys()):
