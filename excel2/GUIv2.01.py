@@ -135,7 +135,7 @@ icono_borrar = ImageTk.PhotoImage(icono_borrar)
 frame_archivos = tk.Frame(root)
 frame_archivos.pack(pady=10)
 
-archivos = {"cim3": "", "cim4": "", "ots": "", "trabajo_real": ""}
+archivos = {"cim3": "", "cim4": "", "ots": "", "trabajo real": ""}
 entradas = []
 
 for i, tipo in enumerate(archivos.keys()):
