@@ -115,12 +115,12 @@ root.geometry("650x300")
 root.config(bg="#F5F5F5")  # Fondo gris claro
 
 # Estilo minimalista para el botón
-def crear_boton(root, texto, comando, ancho=200, alto=40, color_fondo="#2196F3", color_texto="white"):
+def crear_boton(root, texto, comando, ancho=200, alto=40, color_fondo="#9CE18C", color_texto="black"):
     boton = tk.Button(
         root, text=texto, command=comando, 
         width=ancho//10, height=alto//40, 
         bg=color_fondo, fg=color_texto, 
-        font=("Arial", 12, "bold"), relief="flat", bd=0,
+        font=("Arial", 12), relief="flat", bd=0,
         padx=10, pady=5, 
         highlightthickness=0
     )
@@ -156,7 +156,7 @@ btn_generar = crear_boton(frame_botones, "Generar Reporte", lambda: generar_repo
 
 # Botón circular de "Borrar"
 btn_borrar = tk.Button(frame_botones, image=icono_borrar, command=lambda: borrar_archivos(archivos, entradas), bg="#FF5722", bd=0, relief="flat", width=40, height=40)
-btn_borrar.config(width=40, height=35, padx=0, pady=0)  # Configuramos el tamaño del botón circular
+btn_borrar.config(width=39, height=33, padx=0, pady=0)  # Configuramos el tamaño del botón circular
 btn_borrar.pack(side=tk.LEFT, padx=10)
 
 # Posicionar el botón de "Generar Reporte" junto al botón de "Borrar"
