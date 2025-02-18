@@ -1,6 +1,7 @@
-import tkinter as tk
+import customtkinter as ctk
 import os
-from tkinter import filedialog, messagebox
+from PIL import Image, ImageTk
+from tkinter import filedialog, messagebox, PhotoImage
 from openpyxl import Workbook, load_workbook
 from pathlib import Path
 from datetime import datetime
@@ -9,7 +10,7 @@ from openpyxl.styles import PatternFill, Border, Side, Alignment
 def seleccionar_archivo(entry, archivos, tipo):
     archivo = filedialog.askopenfilename(filetypes=[("Archivos de Excel", "*.xlsx")])
     if archivo:
-        entry.delete(0, tk.END)
+        entry.delete(0, ctk.END)
         entry.insert(0, archivo)
         archivos[tipo] = archivo
 
@@ -17,7 +18,7 @@ def borrar_archivos(archivos, entradas):
     for tipo in archivos.keys():
         archivos[tipo] = ""
     for entry in entradas:
-        entry.delete(0, tk.END)
+        entry.delete(0, ctk.END)
 
 def extraer_datos(archivo, columnas):
     ruta = Path(archivo)
@@ -106,29 +107,50 @@ def generar_reporte(archivos):
     wb_nuevo.save(ruta_salida)
     messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en:\n{ruta_salida}")
 
-root = tk.Tk()
-root.title("Procesador de Reportes Excel")
-root.geometry("600x400")
+# Crear la ventana principal con CustomTkinter
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
 
-frame_archivos = tk.Frame(root)
+root = ctk.CTk()
+root.title("Procesador de Reportes Excel")
+root.geometry("600x300")
+
+# Crear un marco para los archivos
+frame_archivos = ctk.CTkFrame(root)
 frame_archivos.pack(pady=10)
 
-archivos = {"cim3": "", "cim4": "", "ots": "", "trabajo_real": ""}
+archivos = {"cim3": "", "cim4": "", "ots": "", "trabajo real": ""}
 entradas = []
 
 for i, tipo in enumerate(archivos.keys()):
-    lbl = tk.Label(frame_archivos, text=f"Archivo {tipo.upper()}: ")
+    lbl = ctk.CTkLabel(frame_archivos, text=f" {tipo.upper()}: ")
     lbl.grid(row=i, column=0, padx=5, pady=5)
-    entry = tk.Entry(frame_archivos, width=40)
+    entry = ctk.CTkEntry(frame_archivos, width=180)
     entry.grid(row=i, column=1, padx=5, pady=5)
     entradas.append(entry)
-    btn = tk.Button(frame_archivos, text="Seleccionar", command=lambda t=tipo, e=entry: seleccionar_archivo(e, archivos, t))
+    btn = ctk.CTkButton(frame_archivos, text="Seleccionar", command=lambda t=tipo, e=entry: seleccionar_archivo(e, archivos, t))
     btn.grid(row=i, column=2, padx=5, pady=5)
 
-btn_generar = tk.Button(root, text="Generar Reporte", command=lambda: generar_reporte(archivos))
-btn_generar.pack(pady=10)
+# Crear un marco para los botones
+frame_botones = ctk.CTkFrame(root)
+frame_botones.pack(pady=10)
 
-btn_borrar = tk.Button(root, text="Borrar Archivos", command=lambda: borrar_archivos(archivos, entradas))
-btn_borrar.pack(pady=10)
+# Botón para generar el reporte
+btn_generar = ctk.CTkButton(frame_botones, text="Generar Reporte", command=lambda: generar_reporte(archivos), width=20, height=29, fg_color="#8EE371", text_color="black")
+btn_generar.grid(row=0, column=0, padx=10)  # Ajusta el espaciado horizontal si es necesario
+
+# Ruta de la imagen
+ruta_imagen = r"C:\Users\ivanb\Project_Saica\excel2\eliminar.png"
+
+# Cargar la imagen con Pillow (PIL)
+imagen_pil = Image.open(ruta_imagen)
+
+# Crear una imagen compatible con customtkinter
+icono_borrar = ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=(20, 20))
+
+# Ahora puedes usar 'icono_borrar' para agregar al botón
+btn_borrar = ctk.CTkButton(frame_botones, text="", image=icono_borrar, command=lambda: borrar_archivos(archivos, entradas), width=20, height=29, 
+                           fg_color="#E55E42")
+btn_borrar.grid(row=0, column=1, padx=5, pady=5)  # Usar grid en lugar de pack
 
 root.mainloop()
