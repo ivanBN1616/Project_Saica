@@ -114,6 +114,7 @@ ctk.set_default_color_theme("blue")
 root = ctk.CTk()
 root.title("Procesador de Reportes Excel")
 root.geometry("600x300")
+root.iconbitmap('C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico')
 
 # Crear un marco para los archivos
 frame_archivos = ctk.CTkFrame(root)
