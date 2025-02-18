@@ -1,16 +1,11 @@
 import customtkinter as ctk
 import os
-import time
-import glob
 from PIL import Image, ImageTk
-from tkinter import filedialog, messagebox, PhotoImage, Toplevel, BooleanVar, Checkbutton
+from tkinter import filedialog, messagebox, PhotoImage
 from openpyxl import Workbook, load_workbook
 from pathlib import Path
 from datetime import datetime
 from openpyxl.styles import PatternFill, Border, Side, Alignment
-
-directorio = os.path.join(os.path.expanduser("~"), "Downloads")  # Ruta a Descargas
-
 
 def seleccionar_archivo(entry, archivos, tipo):
     archivo = filedialog.askopenfilename(filetypes=[("Archivos de Excel", "*.xlsx")])
@@ -47,71 +42,6 @@ def generar_reporte(archivos):
         messagebox.showerror("Error", "Debe seleccionar todos los archivos antes de generar el reporte.")
         return
     
-def buscar_archivos_viejos(directorio):
-    """
-    Busca archivos antiguos de CIM 3, CIM 4, OT y Real en la carpeta dada.
-    """
-    tipos_archivos = ["CIM 3", "CIM 4", "OT", "Real"]
-    archivos_encontrados = {tipo: [] for tipo in tipos_archivos}
-
-    for archivo in glob.glob(os.path.join(directorio, "*")):
-        nombre_archivo = os.path.basename(archivo)
-        for tipo in tipos_archivos:
-            if tipo.lower() in nombre_archivo.lower():
-                archivos_encontrados[tipo].append((archivo, os.path.getmtime(archivo)))
-
-    archivos_a_mostrar = []
-    for tipo, lista_archivos in archivos_encontrados.items():
-        if len(lista_archivos) > 1:
-            lista_archivos.sort(key=lambda x: x[1], reverse=True)  # Ordenar de más reciente a más antiguo
-            archivos_a_mostrar.extend(lista_archivos[1:])  # Excluir el más reciente
-    
-    return archivos_a_mostrar
-
-def mostrar_seleccion_archivos(directorio):
-    """
-    Muestra una ventana emergente para que el usuario elija qué archivos eliminar.
-    """
-    archivos = buscar_archivos_viejos(directorio)
-
-    if not archivos:
-        messagebox.showinfo("Sin archivos para eliminar", "No hay archivos antiguos para borrar.")
-        return
-
-    ventana = Toplevel()
-    ventana.title("Seleccionar archivos para eliminar")
-    ventana.geometry("500x400")
-
-    seleccionados = []
-    
-    def eliminar_seleccionados():
-        eliminados = 0
-        for var, ruta in seleccionados:
-            if var.get():
-                try:
-                    os.remove(ruta)
-                    eliminados += 1
-                except Exception as e:
-                    messagebox.showerror("Error", f"No se pudo eliminar {ruta}: {e}")
-        
-        ventana.destroy()
-        messagebox.showinfo("Eliminación completa", f"Se eliminaron {eliminados} archivos.")
-
-    for archivo, _ in archivos:
-        var = BooleanVar()
-        chk = Checkbutton(ventana, text=os.path.basename(archivo), variable=var)
-        chk.pack(anchor="w")
-        seleccionados.append((var, archivo))
-
-    btn_confirmar = ctk.CTkButton(ventana, text="Eliminar seleccionados", fg_color="red",
-                                  text_color="white", command=eliminar_seleccionados)
-    btn_confirmar.pack(pady=10)
-
-    # Listar todos los archivos en la carpeta
-    print("📂 Archivos en la carpeta:")
-    for archivo in os.listdir(directorio):
-        print(archivo)
-        
     datos_cim3 = extraer_datos(archivos['cim3'], 21)
     datos_cim4 = extraer_datos(archivos['cim4'], 12)
     datos_ots = extraer_datos(archivos['ots'], 12)
@@ -184,8 +114,6 @@ ctk.set_default_color_theme("blue")
 root = ctk.CTk()
 root.title("Procesador de Reportes Excel")
 root.geometry("600x300")
-root.iconbitmap('C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico')
-
 
 # Crear un marco para los archivos
 frame_archivos = ctk.CTkFrame(root)
@@ -210,11 +138,6 @@ frame_botones.pack(pady=10)
 # Botón para generar el reporte
 btn_generar = ctk.CTkButton(frame_botones, text="Generar Reporte", command=lambda: generar_reporte(archivos), width=20, height=29, fg_color="#8EE371", text_color="black")
 btn_generar.grid(row=0, column=0, padx=10)  # Ajusta el espaciado horizontal si es necesario
-
-# Botón para abrir la ventana de selección
-btn_borrar_viejos = ctk.CTkButton(root, text="Seleccionar archivos a eliminar", fg_color="#E62925",
-                                  text_color="white", command=lambda: mostrar_seleccion_archivos("C:/ruta/a/tu/carpeta"))
-btn_borrar_viejos.pack(pady=10)
 
 # Ruta de la imagen
 ruta_imagen = r"C:\Users\ivanb\Project_Saica\excel2\eliminar.png"
