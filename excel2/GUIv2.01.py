@@ -204,7 +204,7 @@ for i, tipo in enumerate(archivos.keys()):
 frame_botones = ctk.CTkFrame(root)
 frame_botones.pack(pady=10)
 
-#icon='C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico' # Agregar el ícono aquí GUIv2.01.spec
+#icon='C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico' 
 
 # Botón para generar el reporte
 btn_generar = ctk.CTkButton(frame_botones, text="", command=lambda: generar_reporte(archivos), image=icono_guardar, width=20, height=29, fg_color="#8EE371", text_color="black")
