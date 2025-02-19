@@ -42,6 +42,39 @@ def generar_reporte(archivos):
         messagebox.showerror("Error", "Debe seleccionar todos los archivos antes de generar el reporte.")
         return
     
+def eliminar_archivos():
+    archivos_a_borrar = filedialog.askopenfilenames(title="Seleccionar archivos a eliminar",
+                                                    filetypes=[("Archivos de Excel", "*.xlsx")])
+
+    if not archivos_a_borrar:
+        return  # No se seleccionó ningún archivo
+
+    # Filtrar solo archivos permitidos (CIM3, CIM4, OT, REAL)
+    archivos_permitidos = ["CIM3", "CIM4", "OT", "REAL"]
+    archivos_validos = [archivo for archivo in archivos_a_borrar if any(nombre in Path(archivo).stem.upper() for nombre in archivos_permitidos)]
+
+    if not archivos_validos:
+        messagebox.showwarning("Advertencia", "Solo puedes eliminar archivos con nombres: CIM3, CIM4, OT o REAL.")
+        return
+
+    confirmacion = messagebox.askyesno("Confirmación", f"¿Seguro que quieres eliminar estos archivos?\n\n" + "\n".join(archivos_validos))
+
+    if confirmacion:
+        for archivo in archivos_validos:
+            try:
+                os.remove(archivo)
+                messagebox.showinfo("Éxito", f"Archivo eliminado: {archivo}")
+
+                # Si eliminamos un archivo usado en la app, lo quitamos de la lista de archivos
+                for tipo in archivos:
+                    if archivos[tipo] == archivo:
+                        archivos[tipo] = ""
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo eliminar {archivo}.\nError: {e}")
+
+
+
+    
     datos_cim3 = extraer_datos(archivos['cim3'], 21)
     datos_cim4 = extraer_datos(archivos['cim4'], 12)
     datos_ots = extraer_datos(archivos['ots'], 12)
@@ -114,7 +147,9 @@ ctk.set_default_color_theme("blue")
 root = ctk.CTk()
 root.title("Procesador de Reportes Excel")
 root.geometry("600x300")
-root.iconbitmap('C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico')
+
+#root.iconbitmap('C:\\Users\\ibajana\\Desktop\\excel2\\paros.ico')
+
 
 # Crear un marco para los archivos
 frame_archivos = ctk.CTkFrame(root)
@@ -141,17 +176,23 @@ btn_generar = ctk.CTkButton(frame_botones, text="Generar Reporte", command=lambd
 btn_generar.grid(row=0, column=0, padx=10)  # Ajusta el espaciado horizontal si es necesario
 
 # Ruta de la imagen
-ruta_imagen = r"C:\Users\ivanb\Project_Saica\excel2\eliminar.png"
+#ruta_imagen = r"C:/Users/ibajana/Desktop/excel2/eliminar.png"
 
 # Cargar la imagen con Pillow (PIL)
-imagen_pil = Image.open(ruta_imagen)
+#imagen_pil = Image.open(ruta_imagen)
 
 # Crear una imagen compatible con customtkinter
-icono_borrar = ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=(20, 20))
+#icono_borrar = ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=(20, 20))   image=icono_borrar
 
 # Ahora puedes usar 'icono_borrar' para agregar al botón
-btn_borrar = ctk.CTkButton(frame_botones, text="", image=icono_borrar, command=lambda: borrar_archivos(archivos, entradas), width=20, height=29, 
+btn_borrar = ctk.CTkButton(frame_botones, text="Borrar", command=lambda: borrar_archivos(archivos, entradas), width=20, height=29, 
                            fg_color="#E55E42")
 btn_borrar.grid(row=0, column=1, padx=5, pady=5)  # Usar grid en lugar de pack
+
+btn_eliminar = ctk.CTkButton(frame_botones, text="Eliminar Archivos", 
+                             command=eliminar_archivos, 
+                             width=120, height=35, 
+                             fg_color="#FF5733", text_color="white")  # Rojo anaranjado
+btn_eliminar.grid(row=0, column=2, padx=5, pady=5)
 
 root.mainloop()
