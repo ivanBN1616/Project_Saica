@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['GUIv2.01.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=[('images', 'images'), ('icon', 'icon')],
