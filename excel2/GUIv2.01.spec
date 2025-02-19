@@ -5,7 +5,7 @@ a = Analysis(
     ['GUIv2.01.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('images', 'images'), ('icon', 'icon')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,5 +35,4 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-
 )
