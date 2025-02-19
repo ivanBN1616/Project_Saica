@@ -185,7 +185,7 @@ btn_generar.grid(row=0, column=0, padx=10)  # Ajusta el espaciado horizontal si 
 
 # Crear una imagen compatible con customtkinter
 #icono_borrar = ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=(20, 20))   image=icono_borrar
-
+#icon='C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico' # Agregar el ícono aquí GUIv2.01.spec
 # Ahora puedes usar 'icono_borrar' para agregar al botón
 btn_borrar = ctk.CTkButton(frame_botones, text="Borrar", command=lambda: borrar_archivos(archivos, entradas), width=20, height=29, 
                            fg_color="#E55E42")

@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico' # Agregar el ícono aquí
+
 )
