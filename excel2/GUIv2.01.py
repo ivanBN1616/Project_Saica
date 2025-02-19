@@ -36,45 +36,47 @@ def formatear_fecha(fecha):
     elif isinstance(fecha, datetime):
         return fecha.strftime('%Y-%m-%d')
     return fecha
-
-def generar_reporte(archivos):
-    if not all(archivos.values()):
-        messagebox.showerror("Error", "Debe seleccionar todos los archivos antes de generar el reporte.")
-        return
     
 def eliminar_archivos():
     archivos_a_borrar = filedialog.askopenfilenames(title="Seleccionar archivos a eliminar",
-                                                    filetypes=[("Archivos de Excel", "*.xlsx")])
+                                                    filetypes=[("Archivos de Excel", "*.xlsx;*.xls")])
 
     if not archivos_a_borrar:
         return  # No se seleccionó ningún archivo
 
-    # Filtrar solo archivos permitidos (CIM3, CIM4, OT, REAL)
+    # Ahora permitimos también CIM3.xls y CIM4.xls
     archivos_permitidos = ["CIM3", "CIM4", "OT", "REAL"]
     archivos_validos = [archivo for archivo in archivos_a_borrar if any(nombre in Path(archivo).stem.upper() for nombre in archivos_permitidos)]
 
     if not archivos_validos:
-        messagebox.showwarning("Advertencia", "Solo puedes eliminar archivos con nombres: CIM3, CIM4, OT o REAL.")
+        messagebox.showwarning("Advertencia", "Solo puedes eliminar archivos con nombres: CIM3, CIM4, CIM3.xls, CIM4.xls, OT o REAL.")
         return
 
     confirmacion = messagebox.askyesno("Confirmación", f"¿Seguro que quieres eliminar estos archivos?\n\n" + "\n".join(archivos_validos))
 
     if confirmacion:
+        errores = []
         for archivo in archivos_validos:
             try:
                 os.remove(archivo)
-                messagebox.showinfo("Éxito", f"Archivo eliminado: {archivo}")
-
-                # Si eliminamos un archivo usado en la app, lo quitamos de la lista de archivos
+                # Si el archivo eliminado estaba en la lista de la app, lo eliminamos
                 for tipo in archivos:
                     if archivos[tipo] == archivo:
                         archivos[tipo] = ""
+
             except Exception as e:
-                messagebox.showerror("Error", f"No se pudo eliminar {archivo}.\nError: {e}")
+                errores.append(f"No se pudo eliminar {archivo}.\nError: {e}")
 
+        if errores:
+            messagebox.showerror("Errores al eliminar archivos", "\n\n".join(errores))
+        else:
+            messagebox.showinfo("Éxito", "Los archivos se eliminaron correctamente.")
 
-
-    
+def generar_reporte(archivos):
+    if not all(archivos.values()):
+        messagebox.showerror("Error", "Debe seleccionar todos los archivos antes de generar el reporte.")
+        return
+      
     datos_cim3 = extraer_datos(archivos['cim3'], 21)
     datos_cim4 = extraer_datos(archivos['cim4'], 12)
     datos_ots = extraer_datos(archivos['ots'], 12)
@@ -164,7 +166,7 @@ for i, tipo in enumerate(archivos.keys()):
     entry = ctk.CTkEntry(frame_archivos, width=180)
     entry.grid(row=i, column=1, padx=5, pady=5)
     entradas.append(entry)
-    btn = ctk.CTkButton(frame_archivos, text="Seleccionar", command=lambda t=tipo, e=entry: seleccionar_archivo(e, archivos, t))
+    btn = ctk.CTkButton(frame_archivos, text="Seleccionar", width=20, height=29, command=lambda t=tipo, e=entry: seleccionar_archivo(e, archivos, t))
     btn.grid(row=i, column=2, padx=5, pady=5)
 
 # Crear un marco para los botones
@@ -189,10 +191,12 @@ btn_borrar = ctk.CTkButton(frame_botones, text="Borrar", command=lambda: borrar_
                            fg_color="#E55E42")
 btn_borrar.grid(row=0, column=1, padx=5, pady=5)  # Usar grid en lugar de pack
 
-btn_eliminar = ctk.CTkButton(frame_botones, text="Eliminar Archivos", 
+# Crear el botón de eliminar archivos y posicionarlo en la parte inferior izquierda
+btn_eliminar = ctk.CTkButton(root, text="Borrar Archivos antiguos", 
                              command=eliminar_archivos, 
-                             width=120, height=35, 
-                             fg_color="#FF5733", text_color="white")  # Rojo anaranjado
-btn_eliminar.grid(row=0, column=2, padx=5, pady=5)
+                             width=120, height=29, 
+                             fg_color="#E55E42", text_color="white")  # Rojo anaranjado
+btn_eliminar.pack(side="left", anchor="sw", padx=10, pady=10)
+
 
 root.mainloop()
