@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import os
+import sys
 from PIL import Image, ImageTk
 from tkinter import filedialog, messagebox, PhotoImage
 from openpyxl import Workbook, load_workbook
@@ -13,6 +14,19 @@ def seleccionar_archivo(entry, archivos, tipo):
         entry.delete(0, ctk.END)
         entry.insert(0, archivo)
         archivos[tipo] = archivo
+
+
+def obtener_ruta_relativa(ruta_archivo):
+    """ Devuelve la ruta del archivo sin importar si se ejecuta como script o ejecutable """
+    if getattr(sys, 'frozen', False):
+        # Si la app está en un .exe (PyInstaller)
+        base_path = sys._MEIPASS
+    else:
+        # Si la app está corriendo como script en Python normal
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    return os.path.join(base_path, ruta_archivo)
+       
 
 def borrar_archivos(archivos, entradas):
     for tipo in archivos.keys():
@@ -150,8 +164,25 @@ root = ctk.CTk()
 root.title("Procesador de Reportes Excel")
 root.geometry("600x300")
 
-#root.iconbitmap('C:\\Users\\ibajana\\Desktop\\excel2\\paros.ico')
+root.iconbitmap(obtener_ruta_relativa("icon/paros.ico"))
 
+# Ruta de las imagenes
+ruta_imagen = obtener_ruta_relativa("images/eliminar.png")
+ruta_guardar = obtener_ruta_relativa("images/guardar.png")
+ruta_abrir = obtener_ruta_relativa("images/edit.png")
+ruta_quemar = obtener_ruta_relativa("images/quemar.png")
+
+# Cargar imágenes en PIL
+imagen_guardar = Image.open(ruta_guardar)
+imagen_pil = Image.open(ruta_imagen)
+imagen_abrir = Image.open(ruta_abrir)
+imagen_quemar = Image.open(ruta_quemar)
+
+# Crear una imagen compatible con customtkinter
+icono_borrar = ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=(20, 20))
+icono_guardar = ctk.CTkImage(light_image=imagen_guardar, dark_image=imagen_guardar, size=(20, 20))
+icono_abrir = ctk.CTkImage(light_image=imagen_abrir, dark_image=imagen_abrir, size=(20, 20))
+icono_quemar = ctk.CTkImage(light_image=imagen_quemar, dark_image=imagen_quemar, size=(20, 20))
 
 # Crear un marco para los archivos
 frame_archivos = ctk.CTkFrame(root)
@@ -166,36 +197,30 @@ for i, tipo in enumerate(archivos.keys()):
     entry = ctk.CTkEntry(frame_archivos, width=180)
     entry.grid(row=i, column=1, padx=5, pady=5)
     entradas.append(entry)
-    btn = ctk.CTkButton(frame_archivos, text="Seleccionar", width=20, height=29, command=lambda t=tipo, e=entry: seleccionar_archivo(e, archivos, t))
+    btn = ctk.CTkButton(frame_archivos, text="", image=icono_abrir, width=20, height=29, command=lambda t=tipo, e=entry: seleccionar_archivo(e, archivos, t))
     btn.grid(row=i, column=2, padx=5, pady=5)
 
 # Crear un marco para los botones
 frame_botones = ctk.CTkFrame(root)
 frame_botones.pack(pady=10)
 
+#icon='C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico' # Agregar el ícono aquí GUIv2.01.spec
+
 # Botón para generar el reporte
-btn_generar = ctk.CTkButton(frame_botones, text="Generar Reporte", command=lambda: generar_reporte(archivos), width=20, height=29, fg_color="#8EE371", text_color="black")
+btn_generar = ctk.CTkButton(frame_botones, text="", command=lambda: generar_reporte(archivos), image=icono_guardar, width=20, height=29, fg_color="#8EE371", text_color="black")
 btn_generar.grid(row=0, column=0, padx=10)  # Ajusta el espaciado horizontal si es necesario
 
-# Ruta de la imagen
-#ruta_imagen = r"C:/Users/ibajana/Desktop/excel2/eliminar.png"
-
-# Cargar la imagen con Pillow (PIL)
-#imagen_pil = Image.open(ruta_imagen)
-
-# Crear una imagen compatible con customtkinter
-#icono_borrar = ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=(20, 20))   image=icono_borrar
-#icon='C:\\Users\\ivanb\\Project_Saica\\excel2\\paros.ico' # Agregar el ícono aquí GUIv2.01.spec
 # Ahora puedes usar 'icono_borrar' para agregar al botón
-btn_borrar = ctk.CTkButton(frame_botones, text="Borrar", command=lambda: borrar_archivos(archivos, entradas), width=20, height=29, 
-                           fg_color="#E55E42")
+btn_borrar = ctk.CTkButton(frame_botones, text="", image=icono_borrar, command=lambda: borrar_archivos(archivos, entradas), width=20, height=29, 
+                           fg_color="#DAE0ED")
 btn_borrar.grid(row=0, column=1, padx=5, pady=5)  # Usar grid en lugar de pack
 
 # Crear el botón de eliminar archivos y posicionarlo en la parte inferior izquierda
-btn_eliminar = ctk.CTkButton(root, text="Borrar Archivos antiguos", 
+btn_eliminar = ctk.CTkButton(root, text="Eliminar antiguos Excel",
+                             image=icono_quemar, 
                              command=eliminar_archivos, 
-                             width=120, height=29, 
-                             fg_color="#E55E42", text_color="white")  # Rojo anaranjado
+                             width=20, height=29, 
+                             fg_color="#E55E42", text_color="black")  # Rojo anaranjado
 btn_eliminar.pack(side="left", anchor="sw", padx=10, pady=10)
 
 
