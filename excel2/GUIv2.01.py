@@ -169,7 +169,7 @@ root.iconbitmap(obtener_ruta_relativa("icon/paros.ico"))
 # Ruta de las imagenes
 ruta_imagen = obtener_ruta_relativa("images/eliminar.png")
 ruta_guardar = obtener_ruta_relativa("images/guardar.png")
-ruta_abrir = obtener_ruta_relativa("images/edit.png")
+ruta_abrir = obtener_ruta_relativa("images/add.png")
 ruta_quemar = obtener_ruta_relativa("images/quemar.png")
 
 # Cargar imágenes en PIL
