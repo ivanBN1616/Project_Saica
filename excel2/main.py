@@ -3,7 +3,7 @@ import os
 import sys
 import subprocess
 import pandas as pd
-import tkinter.messagebox as MessageBox
+import psutil
 from PIL import Image, ImageTk
 from tkinter import filedialog, messagebox, PhotoImage
 from openpyxl import Workbook, load_workbook
@@ -90,7 +90,7 @@ def abrir_ubicacion_archivo(ruta_archivo):
             messagebox.showerror("Error", f"No se pudo abrir la carpeta: {e}")
     else:
         messagebox.showerror("Error", f"La carpeta no existe: {carpeta}")
-        
+
 
 
 # =============================================================================
@@ -116,9 +116,7 @@ def convertir_xls_a_xlsx(ruta_xls, ruta_xlsx=None):
     except Exception as e:
         print(f"Error al convertir {ruta_xls}: {e}")
         return None
-    
-
-
+        
 # =========================================================================================================
 #Funcion que busca entre las carpetas los arcipvos que se muestran en el pcodigo(iconos, imagenes, etc...)
 # =========================================================================================================
@@ -205,6 +203,9 @@ def eliminar_archivos():
         else:
             messagebox.showinfo("Éxito", "Los archivos se eliminaron correctamente.")
 
+
+
+
 # ==============================================================================================================
 #Esta funcion juntamente con el boton de generar crear el archivo Excel que estamos utilizando en nuestra app
 # ==============================================================================================================
@@ -274,6 +275,14 @@ def generar_reporte(archivos):
     ruta_salida = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Archivos de Excel", "*.xlsx")], title="Guardar reporte como", initialfile=f"{datetime.now().strftime('%Y-%m-%d')}_MTO_Registre_diari_OT_paro.xlsx")
     if not ruta_salida:
         return
+    
+    #try:
+        wb_nuevo = Workbook()  # Se crea el libro de trabajo
+        wb_nuevo.save(ruta_salida)  # Intentamos guardar el archivo
+        messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en: {ruta_salida}")
+    #except PermissionError:
+        # Si el archivo está abierto, lanzará un PermissionError
+        #messagebox.showerror("Error", f"No se pudo guardar el archivo. Asegúrate de que el archivo no esté abierto y vuelve a intentarlo.")
 
     wb_nuevo.save(ruta_salida)
     messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en:\n{ruta_salida}")
@@ -281,7 +290,7 @@ def generar_reporte(archivos):
     # Hacer visible el botón de abrir la carpeta del archivo final
     global btn_abrir_carpeta
     if not btn_abrir_carpeta:  # Si el botón aún no ha sido creado
-        btn_abrir_carpeta = ctk.CTkButton(frame_botones, text="Abrir carpeta", 
+        btn_abrir_carpeta = ctk.CTkButton(frame_botones, text="Abrir ubicacion", 
                                            command=lambda: abrir_ubicacion_archivo(ruta_salida), 
                                            image=icono_up, width=20, height=29)
         btn_abrir_carpeta.grid(row=0, column=2, padx=5, pady=5)  # Asegúrate de colocar el botón donde quieras
