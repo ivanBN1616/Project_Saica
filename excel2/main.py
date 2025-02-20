@@ -8,6 +8,8 @@ from pathlib import Path
 from datetime import datetime
 from openpyxl.styles import PatternFill, Border, Side, Alignment
 
+#Selecciona los archivos excel de la carpeta (archivos CIM de descargas)
+
 def seleccionar_archivo(entry, archivos, tipo):
     archivo = filedialog.askopenfilename(filetypes=[("Archivos de Excel", "*.xlsx")])
     if archivo:
@@ -15,7 +17,7 @@ def seleccionar_archivo(entry, archivos, tipo):
         entry.insert(0, archivo)
         archivos[tipo] = archivo
 
-
+#Funcion que busca entre las carpetas los arcipvos que se muestran en el pcodigo(iconos, imagenes, etc...)
 def obtener_ruta_relativa(ruta_archivo):
     """ Devuelve la ruta del archivo sin importar si se ejecuta como script o ejecutable """
     if getattr(sys, 'frozen', False):
@@ -27,13 +29,13 @@ def obtener_ruta_relativa(ruta_archivo):
 
     return os.path.join(base_path, ruta_archivo)
        
-
+#Boton y funcion que eliminar el buffer de los labels cargados
 def borrar_archivos(archivos, entradas):
     for tipo in archivos.keys():
         archivos[tipo] = ""
     for entry in entradas:
         entry.delete(0, ctk.END)
-
+#Extrae los datos de los rchivos excel que seleccionamos en la carpeta de descargas
 def extraer_datos(archivo, columnas):
     ruta = Path(archivo)
     if not ruta.exists():
@@ -44,13 +46,16 @@ def extraer_datos(archivo, columnas):
     hoja = wb.active  
     return [tuple(row[:columnas]) for row in hoja.iter_rows(min_row=2, values_only=True)]
 
+#La funcionde formatear fecha da a e archivo generado un formato del dia que se ha generado
 def formatear_fecha(fecha):
     if isinstance(fecha, str) and ' ' in fecha:
         return fecha.split()[0]
     elif isinstance(fecha, datetime):
         return fecha.strftime('%Y-%m-%d')
     return fecha
-    
+
+
+#El boton junto a la funcion de eliminar archivos busca en la carpeta donde esten situados los archivos CIM y los borra
 def eliminar_archivos():
     archivos_a_borrar = filedialog.askopenfilenames(title="Seleccionar archivos a eliminar",
                                                     filetypes=[("Archivos de Excel", "*.xlsx;*.xls")])
@@ -86,6 +91,8 @@ def eliminar_archivos():
         else:
             messagebox.showinfo("Éxito", "Los archivos se eliminaron correctamente.")
 
+
+#Esta funcion juntamente con el boton de generar crear el archivo Excel que estamos utilizando en nuestra app
 def generar_reporte(archivos):
     if not all(archivos.values()):
         messagebox.showerror("Error", "Debe seleccionar todos los archivos antes de generar el reporte.")
