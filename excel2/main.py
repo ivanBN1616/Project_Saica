@@ -10,9 +10,9 @@ from datetime import datetime
 from openpyxl.styles import PatternFill, Border, Side, Alignment
 
 
-#Selecciona los archivos excel de la carpeta (archivos CIM de descargas)
-
-
+# =============================================================================
+# Funciones para la selección y validación de archivos
+# =============================================================================
 def seleccionar_archivo(entry, archivos, tipo):
     try:
         archivo = filedialog.askopenfilename(filetypes=[("Archivos de Excel", "*.xlsx;*.xls")])
@@ -62,6 +62,10 @@ def seleccionar_archivo(entry, archivos, tipo):
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al seleccionar el archivo para {tipo}: {e}")
 
+
+# =============================================================================
+# Funciones de conversión y lectura de archivos Excel
+# =============================================================================
 def convertir_xls_a_xlsx(ruta_xls, ruta_xlsx=None):
     """
     Convierte un archivo Excel en formato XLS a XLSX.
@@ -83,8 +87,9 @@ def convertir_xls_a_xlsx(ruta_xls, ruta_xlsx=None):
         print(f"Error al convertir {ruta_xls}: {e}")
         return None
 
-
+# =========================================================================================================
 #Funcion que busca entre las carpetas los arcipvos que se muestran en el pcodigo(iconos, imagenes, etc...)
+# =========================================================================================================
 def obtener_ruta_relativa(ruta_archivo):
     """ Devuelve la ruta del archivo sin importar si se ejecuta como script o ejecutable """
     if getattr(sys, 'frozen', False):
@@ -95,14 +100,18 @@ def obtener_ruta_relativa(ruta_archivo):
         base_path = os.path.dirname(os.path.abspath(__file__))
 
     return os.path.join(base_path, ruta_archivo)
-       
+# =============================================================================       
 #Boton y funcion que eliminar el buffer de los labels cargados
+# =============================================================================
 def borrar_archivos(archivos, entradas):
     for tipo in archivos.keys():
         archivos[tipo] = ""
     for entry in entradas:
         entry.delete(0, ctk.END)
+        
+# =====================================================================================
 #Extrae los datos de los rchivos excel que seleccionamos en la carpeta de descargas
+# =====================================================================================
 def extraer_datos(archivo, columnas):
     ruta = Path(archivo)
     if not ruta.exists():
@@ -113,7 +122,9 @@ def extraer_datos(archivo, columnas):
     hoja = wb.active  
     return [tuple(row[:columnas]) for row in hoja.iter_rows(min_row=2, values_only=True)]
 
+# ===========================================================================================
 #La funcionde formatear fecha da a e archivo generado un formato del dia que se ha generado
+# ===========================================================================================
 def formatear_fecha(fecha):
     if isinstance(fecha, str) and ' ' in fecha:
         return fecha.split()[0]
@@ -121,8 +132,9 @@ def formatear_fecha(fecha):
         return fecha.strftime('%Y-%m-%d')
     return fecha
 
-
+# =======================================================================================================================
 #El boton junto a la funcion de eliminar archivos busca en la carpeta donde esten situados los archivos CIM y los borra
+# =======================================================================================================================
 def eliminar_archivos():
     archivos_a_borrar = filedialog.askopenfilenames(title="Seleccionar archivos a eliminar",
                                                     filetypes=[("Archivos de Excel", "*.xlsx;*.xls")])
@@ -158,8 +170,9 @@ def eliminar_archivos():
         else:
             messagebox.showinfo("Éxito", "Los archivos se eliminaron correctamente.")
 
-
+# ==============================================================================================================
 #Esta funcion juntamente con el boton de generar crear el archivo Excel que estamos utilizando en nuestra app
+# ==============================================================================================================
 def generar_reporte(archivos):
     if not all(archivos.values()):
         messagebox.showerror("Error", "Debe seleccionar todos los archivos antes de generar el reporte.")
@@ -230,7 +243,9 @@ def generar_reporte(archivos):
     wb_nuevo.save(ruta_salida)
     messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en:\n{ruta_salida}")
 
+# =============================================================================
 # Crear la ventana principal con CustomTkinter
+# =============================================================================
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -298,4 +313,5 @@ btn_eliminar = ctk.CTkButton(root, text="Eliminar antiguos Excel",
 btn_eliminar.pack(side="left", anchor="sw", padx=10, pady=10)
 
 
+# Iniciar el loop principal de la aplicación
 root.mainloop()
