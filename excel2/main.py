@@ -1,13 +1,18 @@
 import customtkinter as ctk
 import os
 import sys
+import subprocess
 import pandas as pd
+import tkinter.messagebox as MessageBox
 from PIL import Image, ImageTk
 from tkinter import filedialog, messagebox, PhotoImage
 from openpyxl import Workbook, load_workbook
 from pathlib import Path
 from datetime import datetime
 from openpyxl.styles import PatternFill, Border, Side, Alignment
+
+btn_abrir_carpeta = None
+
 
 
 # =============================================================================
@@ -63,6 +68,31 @@ def seleccionar_archivo(entry, archivos, tipo):
         messagebox.showerror("Error", f"Ocurrió un error al seleccionar el archivo para {tipo}: {e}")
 
 
+def abrir_ubicacion_archivo(ruta_archivo):
+    """Abre la carpeta donde está ubicado el archivo generado."""
+    # Obtén la carpeta que contiene el archivo
+    carpeta = os.path.dirname(ruta_archivo)
+    
+    # Verifica si la carpeta realmente existe
+    if os.path.exists(carpeta):
+        try:
+            # Si estás en Windows
+            if os.name == 'nt':
+                # Usamos explorer con el comando adecuado para abrir la carpeta y seleccionar el archivo
+                subprocess.run(['explorer', '/select,', os.path.abspath(ruta_archivo)])
+            # Si estás en macOS
+            elif os.name == 'posix':
+                subprocess.run(['open', carpeta])
+            # Si estás en Linux
+            else:
+                subprocess.run(['xdg-open', carpeta])
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo abrir la carpeta: {e}")
+    else:
+        messagebox.showerror("Error", f"La carpeta no existe: {carpeta}")
+        
+
+
 # =============================================================================
 # Funciones de conversión y lectura de archivos Excel
 # =============================================================================
@@ -86,6 +116,8 @@ def convertir_xls_a_xlsx(ruta_xls, ruta_xlsx=None):
     except Exception as e:
         print(f"Error al convertir {ruta_xls}: {e}")
         return None
+    
+
 
 # =========================================================================================================
 #Funcion que busca entre las carpetas los arcipvos que se muestran en el pcodigo(iconos, imagenes, etc...)
@@ -108,6 +140,9 @@ def borrar_archivos(archivos, entradas):
         archivos[tipo] = ""
     for entry in entradas:
         entry.delete(0, ctk.END)
+
+    # Ocultar el botón de abrir ubicación del archivo
+    btn_abrir_carpeta.grid_forget()
         
 # =====================================================================================
 #Extrae los datos de los rchivos excel que seleccionamos en la carpeta de descargas
@@ -243,6 +278,14 @@ def generar_reporte(archivos):
     wb_nuevo.save(ruta_salida)
     messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en:\n{ruta_salida}")
 
+    # Hacer visible el botón de abrir la carpeta del archivo final
+    global btn_abrir_carpeta
+    if not btn_abrir_carpeta:  # Si el botón aún no ha sido creado
+        btn_abrir_carpeta = ctk.CTkButton(frame_botones, text="Abrir carpeta", 
+                                           command=lambda: abrir_ubicacion_archivo(ruta_salida), 
+                                           image=icono_up, width=20, height=29)
+        btn_abrir_carpeta.grid(row=0, column=2, padx=5, pady=5)  # Asegúrate de colocar el botón donde quieras
+
 # =============================================================================
 # Crear la ventana principal con CustomTkinter
 # =============================================================================
@@ -260,18 +303,21 @@ ruta_imagen = obtener_ruta_relativa("images/eliminar.png")
 ruta_guardar = obtener_ruta_relativa("images/guardar.png")
 ruta_abrir = obtener_ruta_relativa("images/add.png")
 ruta_quemar = obtener_ruta_relativa("images/quemar.png")
+ruta_up = obtener_ruta_relativa("images/upload.png")
 
 # Cargar imágenes en PIL
 imagen_guardar = Image.open(ruta_guardar)
 imagen_pil = Image.open(ruta_imagen)
 imagen_abrir = Image.open(ruta_abrir)
 imagen_quemar = Image.open(ruta_quemar)
+imagen_up = Image.open(ruta_up)
 
 # Crear una imagen compatible con customtkinter
 icono_borrar = ctk.CTkImage(light_image=imagen_pil, dark_image=imagen_pil, size=(20, 20))
 icono_guardar = ctk.CTkImage(light_image=imagen_guardar, dark_image=imagen_guardar, size=(20, 20))
 icono_abrir = ctk.CTkImage(light_image=imagen_abrir, dark_image=imagen_abrir, size=(20, 20))
 icono_quemar = ctk.CTkImage(light_image=imagen_quemar, dark_image=imagen_quemar, size=(20, 20))
+icono_up = ctk.CTkImage(light_image=imagen_up, dark_image=imagen_up, size=(20, 20))
 
 # Crear un marco para los archivos
 frame_archivos = ctk.CTkFrame(root)
