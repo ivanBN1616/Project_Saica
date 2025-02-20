@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import os
 import sys
+import pandas as pd
 from PIL import Image, ImageTk
 from tkinter import filedialog, messagebox, PhotoImage
 from openpyxl import Workbook, load_workbook
@@ -8,14 +9,80 @@ from pathlib import Path
 from datetime import datetime
 from openpyxl.styles import PatternFill, Border, Side, Alignment
 
+
 #Selecciona los archivos excel de la carpeta (archivos CIM de descargas)
 
+
 def seleccionar_archivo(entry, archivos, tipo):
-    archivo = filedialog.askopenfilename(filetypes=[("Archivos de Excel", "*.xlsx")])
-    if archivo:
-        entry.delete(0, ctk.END)
-        entry.insert(0, archivo)
-        archivos[tipo] = archivo
+    try:
+        archivo = filedialog.askopenfilename(filetypes=[("Archivos de Excel", "*.xlsx;*.xls")])
+        
+        if archivo:
+            # Si el archivo es .xls, convertirlo a .xlsx
+            if archivo.lower().endswith(".xls") and not archivo.lower().endswith(".xlsx"):
+                respuesta = messagebox.askyesno("Conversión", "El archivo está en formato .xls. ¿Deseas convertirlo a .xlsx para continuar?")
+                if respuesta:
+                    nuevo_archivo = convertir_xls_a_xlsx(archivo)
+                    if nuevo_archivo:
+                        archivo = nuevo_archivo
+                        messagebox.showinfo("Conversión exitosa", f"Archivo convertido a {nuevo_archivo}")
+                    else:
+                        messagebox.showerror("Error", "No se pudo convertir el archivo.")
+                        return
+                else:
+                    return
+            
+            # Validar que el archivo tenga la extensión correcta (.xlsx)
+            if not archivo.lower().endswith(".xlsx"):
+                messagebox.showerror("Error", f"El archivo seleccionado para {tipo} no es válido.\nDebe ser un archivo Excel (.xlsx).")
+                return
+
+            # Validar que el nombre del archivo contenga la palabra esperada según el tipo
+            nombre_archivo = archivo.lower()
+            if tipo == "cim3" and "cim3" not in nombre_archivo:
+                messagebox.showerror("Error", "El archivo seleccionado para CIM3 debe contener 'cim3' en su nombre.")
+                return
+            elif tipo == "cim4" and "cim4" not in nombre_archivo:
+                messagebox.showerror("Error", "El archivo seleccionado para CIM4 debe contener 'cim4' en su nombre.")
+                return
+            elif tipo == "ots" and "ot" not in nombre_archivo:
+                messagebox.showerror("Error", "El archivo seleccionado para OT debe contener 'ot' en su nombre.")
+                return
+            elif tipo == "trabajo_real" and "real" not in nombre_archivo:
+                messagebox.showerror("Error", "El archivo seleccionado para TRABAJO REAL debe contener 'real' en su nombre.")
+                return
+
+            # Mostrar solo el título del archivo en la entrada
+            titulo_archivo = os.path.basename(archivo)
+            entry.delete(0, ctk.END)
+            entry.insert(0, titulo_archivo)
+            
+            # Guardar la ruta completa en el diccionario para su procesamiento
+            archivos[tipo] = archivo
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al seleccionar el archivo para {tipo}: {e}")
+
+def convertir_xls_a_xlsx(ruta_xls, ruta_xlsx=None):
+    """
+    Convierte un archivo Excel en formato XLS a XLSX.
+    Si ruta_xlsx no se especifica, se creará en el mismo directorio con extensión .xlsx.
+    """
+    if ruta_xlsx is None:
+        base, _ = os.path.splitext(ruta_xls)
+        ruta_xlsx = base + ".xlsx"
+    
+    try:
+        # Lee todas las hojas del archivo XLS
+        excel_xls = pd.read_excel(ruta_xls, sheet_name=None, engine='xlrd')
+        # Crea un objeto ExcelWriter para guardar en XLSX
+        with pd.ExcelWriter(ruta_xlsx, engine='openpyxl') as writer:
+            for hoja, df in excel_xls.items():
+                df.to_excel(writer, sheet_name=hoja, index=False)
+        return ruta_xlsx
+    except Exception as e:
+        print(f"Error al convertir {ruta_xls}: {e}")
+        return None
+
 
 #Funcion que busca entre las carpetas los arcipvos que se muestran en el pcodigo(iconos, imagenes, etc...)
 def obtener_ruta_relativa(ruta_archivo):
