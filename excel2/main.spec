@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='GUIv2.01',
+    name='main',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

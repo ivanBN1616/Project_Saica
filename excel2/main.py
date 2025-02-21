@@ -4,16 +4,14 @@ import sys
 import subprocess
 import pandas as pd
 import psutil
-from PIL import Image, ImageTk
-from tkinter import filedialog, messagebox, PhotoImage
+from PIL import Image
+from tkinter import filedialog, messagebox
 from openpyxl import Workbook, load_workbook
 from pathlib import Path
 from datetime import datetime
 from openpyxl.styles import PatternFill, Border, Side, Alignment
 
 btn_abrir_carpeta = None
-
-
 
 # =============================================================================
 # Funciones para la selección y validación de archivos
@@ -276,16 +274,12 @@ def generar_reporte(archivos):
     if not ruta_salida:
         return
     
-    #try:
-        wb_nuevo = Workbook()  # Se crea el libro de trabajo
-        wb_nuevo.save(ruta_salida)  # Intentamos guardar el archivo
-        messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en: {ruta_salida}")
-    #except PermissionError:
-        # Si el archivo está abierto, lanzará un PermissionError
-        #messagebox.showerror("Error", f"No se pudo guardar el archivo. Asegúrate de que el archivo no esté abierto y vuelve a intentarlo.")
-
-    wb_nuevo.save(ruta_salida)
-    messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en:\n{ruta_salida}")
+    #Si el archivo esta abierto con la aplicacion excel lanzara un mensaje de error que te pedira que cierres el excel antes de guardaelo
+    try:
+        wb_nuevo.save(ruta_salida)
+        messagebox.showinfo("Reporte Generado", f"El reporte se ha guardado en:\n{ruta_salida}")
+    except PermissionError:
+        messagebox.showerror("Error", "No se pudo guardar el archivo. Asegúrate de que el archivo no esté abierto y vuelve a intentarlo.")
 
     # Hacer visible el botón de abrir la carpeta del archivo final
     global btn_abrir_carpeta
