@@ -3,7 +3,6 @@ import os
 import sys
 import subprocess
 import pandas as pd
-import psutil
 from PIL import Image
 from tkinter import filedialog, messagebox
 from openpyxl import Workbook, load_workbook
