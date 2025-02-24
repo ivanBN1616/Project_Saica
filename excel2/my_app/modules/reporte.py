@@ -1,3 +1,4 @@
+# modules/reporte.py
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, PatternFill, Alignment
 from datetime import datetime
@@ -8,11 +9,11 @@ def generar_reporte(archivos):
     Procesa los datos de los archivos y genera un reporte en Excel.
     Devuelve la ruta del reporte generado.
     """
-    # Aquí iría tu lógica de extracción y procesamiento de datos
+    # Aquí debes colocar tu lógica para extraer y procesar datos
     # Ejemplo simplificado:
     resultado = [
         ("Máquina", "Descripción", "Fecha", "Hora", "Duración", "OT Asignada", "Descripción OT", "Trabajos Realizados", "Trabajadores", "Fecha y Hora Comienzo", "Horas Trabajadas"),
-        # Datos procesados...
+        # ... datos procesados
     ]
     
     wb_nuevo = Workbook()
@@ -24,18 +25,17 @@ def generar_reporte(archivos):
     alineacion_centro = Alignment(horizontal="center", vertical="center", wrap_text=True)
 
     # Escribir encabezados
-    titulos = resultado[0]
-    for col, titulo in enumerate(titulos, start=1):
+    for col, titulo in enumerate(resultado[0], start=1):
         celda = ws.cell(row=1, column=col, value=titulo)
         celda.fill = relleno_verde
         celda.border = borde
         celda.alignment = alineacion_centro
 
-    # Escribir datos (aquí deberías usar tus datos procesados)
+    # Escribir datos (desde la fila 2 en adelante)
     for fila in resultado[1:]:
         ws.append(fila)
 
-    # Ruta de guardado (esto puede provenir de config o diálogo)
-    ruta_salida = f"{datetime.now().strftime('%Y-%m-%d')}_Reporte.xlsx"
-    wb_nuevo.save(ruta_salida)
-    return ruta_salida
+    # Generar un nombre único para el reporte
+    nombre_archivo = f"{datetime.now().strftime('%Y-%m-%d')}_{'MTO_Registre_diari_OT_paro'}.xlsx"
+    # La ruta podría venir de config o un diálogo de guardado
+    return nombre_archivo, wb_nuevo
