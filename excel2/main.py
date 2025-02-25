@@ -153,13 +153,13 @@ def extraer_datos(archivo, columnas):
     return [tuple(row[:columnas]) for row in hoja.iter_rows(min_row=2, values_only=True)]
 
 # ===========================================================================================
-#La funcionde formatear fecha da a e archivo generado un formato del dia que se ha generado
+#La funcionde formatear fecha da a el archivo generado un formato del dia que se ha generado
 # ===========================================================================================
 def formatear_fecha(fecha):
     if isinstance(fecha, str) and ' ' in fecha:
         return fecha.split()[0]
     elif isinstance(fecha, datetime):
-        return fecha.strftime('%Y-%m-%d')
+        return fecha.strftime('%m/%d')
     return fecha
 
 # =======================================================================================================================
@@ -252,7 +252,7 @@ def generar_reporte(archivos):
     relleno_verde = PatternFill("solid", fgColor="90FE93")
     alineacion_centro = Alignment(horizontal="center", vertical="center", wrap_text=True)
 
-    titulos = ["Máquina", "Descripción", "Fecha", "Hora", "Duración", "OT Asignada", "Descripción OT", "Trabajos Realizados", "Trabajadores", "Fecha y Hora Comienzo", "Horas Trabajadas"]
+    titulos = ["Máquina", "Descripción", "Fecha", "Hora", "Duración", "OT Asignada", "Descripción OT", "Trabajos Realizados", "Trabajadores", "Comienzo Trabajo", "Horas Trabajadas"]
     for col, titulo in enumerate(titulos, start=1):
         celda = ws.cell(row=1, column=col, value=titulo)
         celda.fill = relleno_verde
