@@ -235,31 +235,28 @@ def generar_reporte(archivos):
                 desc_ot = ot[11]
                 break
         
-        trabajos_realizados = ", ".join(set(str(trabajo[8]) if trabajo[8] is not None else "Sin información" 
+        trabajos_realizados = "\n".join(set(str(trabajo[8]) if trabajo[8] is not None else "Sin información" 
                                     for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
 
 
-        trabajadores = ", ".join(set(str(trabajo[9]) if trabajo[9] is not None else "Sin trabajador asignado" 
-                             for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
+        # Obtener los trabajadores asociados a la OT en líneas separadas
+        trabajadores = "\n".join(set(str(trabajo[9]) if trabajo[9] is not None else "Sin trabajador asignado" 
+                                    for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
 
-            
-        # Obtener todos los valores de "Comienzo Trabajo" asociados a la misma OT
-        fechas_comienzo = set(str(formatear_fecha(trabajo[4])) if trabajo[4] is not None else "Sin fecha"
-                            for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada)
-        horas_comienzo = set(str(trabajo[5].strftime('%H:%M:%S')) if isinstance(trabajo[5], datetime) else str(trabajo[5]) 
-                            if trabajo[5] is not None else "Sin hora"
-                            for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada)
-
-        # Unir fechas y horas en un solo campo
-        fecha_comienzo = ", ".join(fechas_comienzo)
-        hora_comienzo = ", ".join(horas_comienzo)
-
-        # Si ambos son "-", se pone un mensaje claro
-        fecha_hora_comienzo = f"{fecha_comienzo} {hora_comienzo}" if fecha_comienzo != "Sin fecha" and hora_comienzo != "Sin hora" else "Sin información"
-
-        # Obtener todas las horas trabajadas asociadas a la misma OT
-        horas_trabajadas = ", ".join(set(str(trabajo[6]) if trabajo[6] is not None else "Sin horas"
+        # Obtener todos los valores de "Comienzo Trabajo" en líneas separadas
+        fechas_comienzo = "\n".join(set(str(formatear_fecha(trabajo[4])) if trabajo[4] is not None else "Sin fecha"
                                         for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
+
+        horas_comienzo = "\n".join(set(str(trabajo[5].strftime('%H:%M:%S')) if isinstance(trabajo[5], datetime) else str(trabajo[5])
+                                    if trabajo[5] is not None else "Sin hora"
+                                    for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
+
+        fecha_hora_comienzo = f"{fechas_comienzo}\n{horas_comienzo}" if fechas_comienzo != "Sin fecha" and horas_comienzo != "Sin hora" else "Sin información"
+
+        # Obtener todas las horas trabajadas en líneas separadas
+        horas_trabajadas = "\n".join(set(str(trabajo[6]) if trabajo[6] is not None else "Sin horas"
+                                        for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
+
 
         
         resultado.append((ubicacion, descripcion, fecha, hora, duracion, ot_asignada, desc_ot, trabajos_realizados, trabajadores, fecha_hora_comienzo, horas_trabajadas))
