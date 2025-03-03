@@ -225,8 +225,8 @@ def generar_reporte(archivos):
         ubicacion, descripcion, hora, fecha, duracion = averia
         ot_asignada = "-"
         desc_ot = "-"
-        fecha_comienzo = "-"
-        hora_comienzo = "-"
+        fechas_comienzo = "-"
+        horas_comienzo = "-"
         horas_trabajadas = "-"
         
         for ot in datos_ots:
@@ -235,19 +235,18 @@ def generar_reporte(archivos):
                 desc_ot = ot[11]
                 break
         
-        trabajos_realizados = "\n".join(set(str(trabajo[8]) if trabajo[8] is not None else "Sin información" 
-                                    for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
-
+        trabajos_realizados = "\n\n".join(set(str(trabajo[8]) if trabajo[8] is not None else "Sin información" 
+                                    for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))or "Sin información"
 
         # Obtener los trabajadores asociados a la OT en líneas separadas
-        trabajadores = "\n".join(set(str(trabajo[9]) if trabajo[9] is not None else "Sin trabajador asignado" 
-                                    for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
+        trabajadores = "\n\n".join(set(str(trabajo[9]) if trabajo[9] is not None else "Sin trabajador asignado" 
+                                    for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))or "Sin trabajador asignado" 
 
         # Obtener todos los valores de "Comienzo Trabajo" en líneas separadas
         fechas_comienzo = "\n".join(set(str(formatear_fecha(trabajo[4])) if trabajo[4] is not None else "Sin fecha"
-                                        for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
+                                        for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))or "Sin fecha"
 
-        horas_comienzo = "\n".join(set(str(trabajo[5].strftime('%H:%M:%S')) if isinstance(trabajo[5], datetime) else str(trabajo[5])
+        horas_comienzo = "\n".join(set(str(trabajo[5].strftime('%H:%M')) if isinstance(trabajo[5], datetime) else str(trabajo[5])
                                     if trabajo[5] is not None else "Sin hora"
                                     for trabajo in datos_trabajo_real if trabajo[2] == ot_asignada))
 
